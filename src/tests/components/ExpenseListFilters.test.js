@@ -11,7 +11,7 @@ beforeEach(() => {
   sortByAmount = jest.fn();
   sortByDate = jest.fn();
   setEndDate = jest.fn();
-  setEndDate = jest.fn();
+  setStartDate = jest.fn();
   wrapper = shallow(
     <ExpenseListFilters 
       filters={filters}
@@ -64,5 +64,11 @@ test('should handle date changes', () => {
   const endDate = moment(0).add(8, 'years');
   wrapper.find('DateRangePicker').prop('onDatesChange')({ startDate, endDate });
   expect(setStartDate).toHaveBeenLastCalledWith(startDate);
-  //expect(setEndDate).toHaveBeenLastCalledWith(endDate);
+  expect(setEndDate).toHaveBeenLastCalledWith(endDate);
+});
+
+test('should handle date focus changes', () => {
+  const calendarFocus = 'endDate';
+  wrapper.find('DateRangePicker').prop('onFocusChange')(calendarFocus);
+  expect(wrapper.state('calendarFocused')).toBe(calendarFocus);
 });

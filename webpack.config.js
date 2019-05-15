@@ -1,7 +1,12 @@
 // entry point => output
 const path = require('path');
-console.log(path.join(__dirname, 'public'));
-module.exports = {
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+module.exports = (env) => {
+  const isProduction = env === 'production'
+  const CSSExtract = new ExtractTextPlugin('styles.css');
+
+  return {
     entry: './src/app.js',
     output: {
       path: path.join(__dirname, 'public'), // absolute path on machine where you want to output bundle.js
@@ -14,16 +19,31 @@ module.exports = {
         exclude: /node_modules/
       }, {
         test: /\.s?css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'sass-loader'
-        ]
+        use: CSSExtract.extract({
+          use: [
+            {
+              loader: 'css-loader', // CSS source maps for DEV
+              options: {
+                sourceMap: true
+              }
+            },
+            {
+              loader: 'sass-loader', // CSS source maps for DEV
+              options: {
+                sourceMap: true
+              }
+            }
+          ]
+        })
       }]
     },
-    devtool: 'cheap-module-eval-source-map',
+    plugins: [
+      CSSExtract
+    ],
+    devtool: isProduction ? 'source-map' : 'inline-source-map',
     devServer: {
       contentBase: path.join(__dirname, 'public'),
       historyApiFallback: true
     }
+  };
 };

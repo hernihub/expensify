@@ -8,7 +8,6 @@ export class ExpenseListFilters extends React.Component {
   state = {
     calendarFocused: null
   };
-
   onDatesChange = ({startDate, endDate}) => { // destructuring the object
     this.props.setStartDate(startDate);
     this.props.setEndDate(endDate);
@@ -19,14 +18,13 @@ export class ExpenseListFilters extends React.Component {
   onSortChange = (e) => { 
     if (e.target.value === 'date') {
       this.props.sortByDate();
-    } else if (e.target.value === 'amount'){
+    } else if (e.target.value === 'amount') {
       this.props.sortByAmount();
     }
   };
   onTextChange = (e) => {
     this.props.setTextFilter(e.target.value);
   };
-
   render() {
     return (
       <div>
@@ -36,11 +34,11 @@ export class ExpenseListFilters extends React.Component {
           <option value="amount">Amount</option>
         </select>
         <DateRangePicker
-                startDate={this.props.filters.startDate} // momentPropTypes.momentObj or null
+                startDate={this.props.filters.startDate}
                 endDate={this.props.filters.endDate}
-                onDatesChange={this.onDatesChange} // PropTypes.func.isRequired
-                focusedInput={this.state.calendarFocused} // PropTypes.bool
-                onFocusChange={this.onFocusChange} // PropTypes.func.isRequired
+                onDatesChange={this.onDatesChange}
+                focusedInput={this.state.calendarFocused}
+                onFocusChange={this.onFocusChange}
                 showClearDates={true}
                 numberOfMonths={1}
                 isOutsideRange={() => false}
