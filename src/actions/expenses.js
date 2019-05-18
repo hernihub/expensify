@@ -37,3 +37,24 @@ export const editExpense = ( id, updates ) => ({
   id,
   updates
 });
+
+export const setExpenses = (expenses) => ({
+  type: 'SET_EXPENSES',
+  expenses
+});
+
+// Fetch the data and dispatch the latter
+export const startSetExpenses = () => {
+  return (dispatch) => { // this functions gets called internally by Redux with dispatch as an argument
+    return database.ref('expenses').once('value').then((snapshot) => { // Returning the promise to it can be chained downstream
+      const expenses = [];
+      snapshot.forEach((childSnapshot) => {
+        expenses.push({
+          id: childSnapshot.key,
+          ...childSnapshot.val()
+        });
+      })
+      dispatch(setExpenses(expenses));
+    });
+  };
+};
