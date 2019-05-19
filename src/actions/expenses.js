@@ -8,7 +8,8 @@ export const addExpense = (expense) => ({
 });
 
 export const startAddExpense = (expenseData = {}) => {
-  return (dispatch) => { // this functions gets called internally by Redux with dispatch as an argument
+  return (dispatch, getState) => { // this functions gets called internally by Redux with dispatch as an argument
+    const uid = getState().auth.uid;
     const {
       description = '',
       note = '',
@@ -16,7 +17,7 @@ export const startAddExpense = (expenseData = {}) => {
       createdAt = 0
     } = expenseData;
     const expense = { description, note, amount, createdAt };
-    return database.ref('expenses').push(expense).then((ref) => { // Returning the promise to it can be chained downstream
+    return database.ref(`users/${uid}/expenses`).push(expense).then((ref) => { // Returning the promise to it can be chained downstream
       dispatch(addExpense({
         id: ref.key,
         ...expense
@@ -30,6 +31,15 @@ export const removeExpense = ( { id } = {} ) => ({
   type: 'REMOVE_EXPENSE',
   id
 });
+
+export const startRemoveExpense = ({ id } = {}) => {
+  return (dispatch, getState) => { // this functions gets called internally by Redux with dispatch as an argument
+    const uid = getState().auth.uid;
+    return database.ref(`users/${uid}/expenses/${id}`).remove().then(() => { // Returning the promise to it can be chained downstream
+      dispatch(removeExpense({id}));
+    });
+  };
+};
   
 // EDIT EXPENSE action generator
 export const editExpense = ( id, updates ) => ({
@@ -38,6 +48,15 @@ export const editExpense = ( id, updates ) => ({
   updates
 });
 
+export const startEditExpense = (id, updates) => {
+  return (dispatch, getState) => { // this functions gets called internally by Redux with dispatch as an argument
+    const uid = getState().auth.uid;
+    return database.ref(`users/${uid}/expenses/${id}`).update(updates).then(() => { // Returning the promise to it can be chained downstream
+      dispatch(editExpense(id, updates));
+    });
+  };
+};
+
 export const setExpenses = (expenses) => ({
   type: 'SET_EXPENSES',
   expenses
@@ -45,8 +64,9 @@ export const setExpenses = (expenses) => ({
 
 // Fetch the data and dispatch the latter
 export const startSetExpenses = () => {
-  return (dispatch) => { // this functions gets called internally by Redux with dispatch as an argument
-    return database.ref('expenses').once('value').then((snapshot) => { // Returning the promise to it can be chained downstream
+  return (dispatch, getState) => { // this functions gets called internally by Redux with dispatch as an argument
+    const uid = getState().auth.uid;
+    return database.ref(`users/${uid}/expenses`).once('value').then((snapshot) => { // Returning the promise to it can be chained downstream
       const expenses = [];
       snapshot.forEach((childSnapshot) => {
         expenses.push({
